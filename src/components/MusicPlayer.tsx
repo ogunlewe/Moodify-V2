@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 import LikeButton from './LikeButton';
@@ -17,24 +17,31 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ id, url, title, artist, curre
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying && currentSong?.id === id) {
-        audioRef.current.play();
-      } else {
-        audioRef.current.pause();
+    const playAudio = async () => {
+      if (audioRef.current) {
+        if (isPlaying && currentSong?.id === id) {
+          try {
+            await audioRef.current.play();
+          } catch (error) {
+            console.error("Audio play failed:", error);
+          }
+        } else {
+          audioRef.current.pause();
+        }
       }
-    }
+    };
+    playAudio();
   }, [isPlaying, currentSong, id]);
 
   const handlePlayPause = async () => {
     togglePlay({ id, url, title, artist });
-
     if (!isPlaying) {
-      // Increment play count in Firestore
       const songRef = doc(db, 'songs', id);
-      await updateDoc(songRef, {
-        playCount: increment(1),
-      });
+      try {
+        await updateDoc(songRef, { playCount: increment(1) });
+      } catch (error) {
+        console.error("Failed to update play count:", error);
+      }
     }
   };
 
@@ -44,7 +51,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ id, url, title, artist, curre
         {isPlaying && currentSong?.id === id ? 'Pause' : 'Play'}
       </button>
       <LikeButton songId={id} />
-      <audio ref={audioRef} src={url} />
+      <audio ref={audioRef} src={url} controls style={{ display: 'none' }} key={id} />
     </div>
   );
 };

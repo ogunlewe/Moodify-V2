@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import PlaylistModal from "../components/PlayListModal";
 import { Play, Pause, PlusCircle } from "lucide-react";
@@ -33,6 +33,8 @@ const Playlists: React.FC<PlaylistsProps> = ({ currentSong, isPlaying, togglePla
   const [selectedPlaylist, setSelectedPlaylist] = useState<Playlist | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [selectedSongs, setSelectedSongs] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -52,6 +54,39 @@ const Playlists: React.FC<PlaylistsProps> = ({ currentSong, isPlaying, togglePla
 
     fetchPlaylists();
   }, []);
+
+  useEffect(() => {
+    const fetchSongs = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "songs"));
+        const allSongs = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Song[];
+        setSongs(allSongs);
+      } catch (err) {
+        setError("Failed to load songs. Please try again.");
+      }
+    };
+
+    fetchSongs();
+  }, []);
+
+  const handleAddSongsToPlaylist = async () => {
+    if (selectedPlaylist) {
+      try {
+        const updatedSongs = [...selectedPlaylist.songs, ...songs.filter(song => selectedSongs.includes(song.id))];
+        await addDoc(collection(db, "playlists"), {
+          ...selectedPlaylist,
+          songs: updatedSongs,
+        });
+        setSelectedPlaylist({ ...selectedPlaylist, songs: updatedSongs });
+        setIsAddModalOpen(false);
+      } catch (err) {
+        setError("Failed to add songs to playlist. Please try again.");
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
@@ -127,7 +162,38 @@ const Playlists: React.FC<PlaylistsProps> = ({ currentSong, isPlaying, togglePla
       {/* Add Song Modal */}
       <PlaylistModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)}>
         <h2 className="text-xl font-semibold mb-4">Add Songs to Playlist</h2>
-        <p className="text-gray-400">(Feature coming soon...)</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {songs.map((song) => (
+            <div key={song.id} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={selectedSongs.includes(song.id)}
+                onChange={() => {
+                  if (selectedSongs.includes(song.id)) {
+                    setSelectedSongs(selectedSongs.filter(id => id !== song.id));
+                  } else {
+                    setSelectedSongs([...selectedSongs, song.id]);
+                  }
+                }}
+              />
+              <img
+                src={song.cover || "https://via.placeholder.com/300"}
+                alt={song.title}
+                className="w-12 h-12 object-cover rounded-md"
+              />
+              <div>
+                <h4 className="font-semibold">{song.title}</h4>
+                <p className="text-sm text-gray-400">{song.artist}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button
+          className="bg-green-500 px-4 py-2 rounded-full mt-4 hover:bg-green-400 transition"
+          onClick={handleAddSongsToPlaylist}
+        >
+          Add Selected Songs
+        </button>
       </PlaylistModal>
     </div>
   );

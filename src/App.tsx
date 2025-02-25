@@ -19,16 +19,6 @@ interface Song {
   url: string;
 }
 
-interface MusicPlayerWidgetProps {
-  currentSong: Song;
-  isPlaying: boolean;
-  onPlayPause: () => void;
-  onNext: () => void;
-  onPrev: () => void;
-  queue: Song[];
-  onRemoveFromQueue: (songId: string) => void;
-}
-
 const App: React.FC = () => {
   const auth = getAuth();
   const [user, loading] = useAuthState(auth);
