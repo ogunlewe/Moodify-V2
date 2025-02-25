@@ -3,6 +3,7 @@ import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from "../firebaseConfig";
 import PlaylistModal from "../components/PlayListModal";
 import { Play, Pause, PlusCircle } from "lucide-react";
+import FollowButton from "../components/FollowButton";
 
 interface Song { 
   id: string;
@@ -23,10 +24,9 @@ interface PlaylistsProps {
   currentSong: Song | null;
   isPlaying: boolean;
   togglePlay: (song: Song) => void;
-  handleAddToQueue: (song: Song) => void;
 }
 
-const Playlists: React.FC<PlaylistsProps> = ({ currentSong, isPlaying, togglePlay, handleAddToQueue }) => {
+const Playlists: React.FC<PlaylistsProps> = ({ currentSong, isPlaying, togglePlay }) => {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -117,6 +117,36 @@ const Playlists: React.FC<PlaylistsProps> = ({ currentSong, isPlaying, togglePla
               >
                 <h3 className="font-semibold">{playlist.name}</h3>
                 <p className="text-sm text-gray-400">by {playlist.userId}</p>
+                <div className="mt-2">
+                  {playlist.songs.map((song) => (
+                    <div key={song.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={song.cover || "https://via.placeholder.com/300"}
+                          alt={song.title}
+                          className="w-12 h-12 object-cover rounded-md"
+                        />
+                        <div>
+                          <h4 className="font-semibold">{song.title}</h4>
+                          <p className="text-sm text-gray-400">{song.artist}</p>
+                        </div>
+                      </div>
+                      <button
+                        className="bg-green-500 p-2 rounded-full transition hover:bg-green-400"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          togglePlay(song);
+                        }}
+                      >
+                        {currentSong && currentSong.id === song.id && isPlaying ? (
+                          <Pause size={20} />
+                        ) : (
+                          <Play size={20} />
+                        )}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))
           ) : (

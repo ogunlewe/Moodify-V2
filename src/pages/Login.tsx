@@ -1,15 +1,14 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebaseConfig";
+import { toast } from "react-toastify";
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const auth = getAuth();
@@ -20,65 +19,58 @@ const Login: React.FC = () => {
       if (isRegistering) {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-        // Save user profile data in Firestore
-        await setDoc(doc(db, 'users', user.uid), {
-          name: user.displayName || 'Anonymous',
+        await setDoc(doc(db, "users", user.uid), {
+          name: user.displayName || "Anonymous",
           email: user.email,
         });
-        setMessage('Registration successful! You can now log in.');
-        toast.success('Registration successful!');
+        toast.success("Registration successful! You can now log in.");
       } else {
         await signInWithEmailAndPassword(auth, email, password);
-        setMessage('Login successful!');
-        toast.success('Login successful!');
-        navigate('/');
+        toast.success("Login successful!");
+        navigate("/");
       }
     } catch (error) {
-      console.error(error);
-      setMessage('An error occurred. Please try again.');
-      setError('Failed to log in. Please check your credentials.');
-      toast.error('Failed to log in. Please check your credentials.');
+      setError("Failed to log in. Please check your credentials.");
+      toast.error("Login failed. Please try again.");
     }
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-500 to-purple-600 min-h-screen flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h1 className="text-3xl font-bold mb-6 text-center text-black">{isRegistering ? 'Register' : 'Login'}</h1>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        {message && <p className="text-black">{message}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-900 mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-black"
-              placeholder="Email"
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label className="block text-gray-900 mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded text-black"
-              placeholder="Password"
-              required
-            />
-          </div>
+    <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="bg-[#181818] p-8 rounded-lg shadow-xl w-full max-w-md border border-gray-700">
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          {isRegistering ? "Create an Account" : "Log In"}
+        </h1>
+        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-3 bg-[#282828] border border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-white"
+            placeholder="Email"
+            required
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full p-3 bg-[#282828] border border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 outline-none text-white"
+            placeholder="Password"
+            required
+          />
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition duration-200"
+            className="w-full bg-green-500 py-3 rounded-lg font-semibold hover:bg-green-400 transition"
           >
-            {isRegistering ? 'Register' : 'Login'}
+            {isRegistering ? "Sign Up" : "Log In"}
           </button>
         </form>
-        <button onClick={() => setIsRegistering(!isRegistering)} className="w-full bg-gray-500 text-white py-2 rounded hover:bg-gray-600 transition duration-200 mt-4">
-          {isRegistering ? 'Already have an account? Login' : 'Create an account'}
+        <button
+          onClick={() => setIsRegistering(!isRegistering)}
+          className="w-full mt-4 text-gray-400 hover:text-white text-sm text-center"
+        >
+          {isRegistering ? "Already have an account? Log In" : "Don't have an account? Sign Up"}
         </button>
       </div>
     </div>

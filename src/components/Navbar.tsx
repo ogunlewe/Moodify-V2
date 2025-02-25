@@ -30,41 +30,41 @@ const Navbar: React.FC = () => {
           <li>
             <Link
               to="/"
-              className="flex flex-col items-center space-y-1 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
+              className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
               onClick={toggleSidebar}
             >
               <Home size={24} className="text-leaf-green" />
-              <span className="text-sm font-medium">Home</span>
+              <span className="text-lg font-medium">Home</span>
             </Link>
           </li>
           <li>
             <Link
               to="/upload"
-              className="flex flex-col items-center space-y-1 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
+              className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
               onClick={toggleSidebar}
             >
               <Upload size={24} className="text-leaf-green" />
-              <span className="text-sm font-medium">Upload</span>
+              <span className="text-lg font-medium">Upload</span>
             </Link>
           </li>
           <li>
             <Link
               to="/songs"
-              className="flex flex-col items-center space-y-1 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
+              className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
               onClick={toggleSidebar}
             >
               <Music size={24} className="text-leaf-green" />
-              <span className="text-sm font-medium">Songs</span>
+              <span className="text-lg font-medium">Songs</span>
             </Link>
           </li>
           <li>
             <Link
               to="/playlists"
-              className="flex flex-col items-center space-y-1 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
+              className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
               onClick={toggleSidebar}
             >
               <ListMusic size={24} className="text-leaf-green" />
-              <span className="text-sm font-medium">Playlists</span>
+              <span className="text-lg font-medium">Playlists</span>
             </Link>
           </li>
         </ul>
@@ -73,11 +73,11 @@ const Navbar: React.FC = () => {
         <div className="mt-auto pb-6">
           <Link
             to="/profile"
-            className="flex flex-col items-center space-y-1 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
+            className="flex items-center space-x-3 text-white hover:bg-gray-800 px-4 py-2 rounded-lg transition duration-200"
             onClick={toggleSidebar}
           >
             <User size={24} className="text-leaf-green" />
-            <span className="text-sm font-medium">Profile</span>
+            <span className="text-lg font-medium">Profile</span>
           </Link>
         </div>
       </nav>

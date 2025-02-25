@@ -1,47 +1,29 @@
 import React, { useState, useEffect } from "react";
-import { Play, Pause } from "lucide-react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebaseConfig";
+import { Play, Pause } from "lucide-react";
 import FollowButton from "../components/FollowButton";
-
-interface Song {
-  id: string;
-  title: string;
-  artist: string;
-  cover: string;
-  url: string;
-  uploaderName?: string;
-  userId?: string;
-}
+import { Song } from "./Home";
 
 interface SongsProps {
   currentSong: Song | null;
   isPlaying: boolean;
   togglePlay: (song: Song) => void;
-  handleAddToQueue: (song: Song) => void;
 }
 
-const Songs: React.FC<SongsProps> = ({ currentSong, isPlaying, togglePlay, handleAddToQueue }) => {
+const Songs: React.FC<SongsProps> = ({ currentSong, isPlaying, togglePlay }) => {
   const [songs, setSongs] = useState<Song[]>([]);
+  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchSongs = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "songs"));
-        const allSongs = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            title: data.title,
-            artist: data.artist,
-            cover: data.cover,
-            url: data.url,
-            uploaderName: data.uploaderName,
-            userId: data.userId,
-          } as Song;
-        });
+        const allSongs = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Song[];
         setSongs(allSongs);
       } catch (err) {
         setError("Failed to load songs. Please try again.");
@@ -49,73 +31,52 @@ const Songs: React.FC<SongsProps> = ({ currentSong, isPlaying, togglePlay, handl
         setLoading(false);
       }
     };
-
     fetchSongs();
   }, []);
 
+  if (loading) return <p className="p-6 text-white">Loading songs...</p>;
+
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col">
-      <section className="px-6 py-4">
-        <h2 className="text-2xl font-semibold mb-4">All Songs</h2>
-
-        {loading && <p className="text-gray-400">Loading songs...</p>}
-        {error && <p className="text-red-500">{error}</p>}
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {songs.length > 0 ? (
-            songs.map((song) => (
-              <div
-                key={song.id}
-                className="bg-gray-800 p-4 rounded-lg hover:bg-gray-700 transition cursor-pointer"
-                onClick={() => togglePlay(song)}
+    <section className="p-6 bg-black text-white min-h-screen">
+      <h1 className="text-4xl font-bold mb-6">All Songs</h1>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {songs.map((song) => (
+          <div
+            key={song.id}
+            className="bg-[#1e1e1e] p-4 rounded-lg shadow-lg hover:bg-[#2a2a2a] transition cursor-pointer border border-gray-700"
+          >
+            <div className="relative group">
+              <img
+                src={song.cover || "https://via.placeholder.com/300"}
+                alt={song.title}
+                className="w-full h-48 object-cover rounded-md shadow-md"
+              />
+              <button
+                className="absolute bottom-4 right-4 bg-green-500 p-3 rounded-full shadow-lg hover:bg-green-400 opacity-0 group-hover:opacity-100 transition"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlay(song);
+                }}
               >
-                <img
-                  src={song.cover || "https://via.placeholder.com/300"}
-                  alt={song.title}
-                  className="w-full h-32 object-cover rounded-md mb-3"
-                />
-                <h3 className="font-semibold">{song.title}</h3>
-                <p className="text-sm text-gray-400">{song.artist}</p>
-                {/* Show uploader name */}
-                <p className="text-xs text-gray-300">
-                  Uploaded by: {song.uploaderName ? song.uploaderName : "Anonymous"}
-                </p>
-                {/* Follow uploader button */}
-                {song.userId && (
-                  <div className="mt-2">
-                    <FollowButton userIdToFollow={song.userId} />
-                  </div>
+                {currentSong && currentSong.id === song.id && isPlaying ? (
+                  <Pause size={24} />
+                ) : (
+                  <Play size={24} />
                 )}
-                <button
-                  className="mt-3 bg-green-500 p-2 rounded-full transition hover:bg-green-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePlay(song);
-                  }}
-                >
-                  {currentSong && currentSong.id === song.id && isPlaying ? (
-                    <Pause size={20} />
-                  ) : (
-                    <Play size={20} />
-                  )}
-                </button>
-                <button
-                  className="mt-3 bg-blue-500 p-2 rounded-full transition hover:bg-blue-400"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleAddToQueue(song);
-                  }}
-                >
-                  Add to Queue
-                </button>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-400">No songs available</p>
-          )}
-        </div>
-      </section>
-    </div>
+              </button>
+            </div>
+            <div className="mt-4 text-center">
+              <h2 className="text-lg font-semibold truncate text-white">{song.title}</h2>
+              <p className="text-sm text-gray-400 truncate">{song.artist}</p>
+            </div>
+            <div className="mt-3 flex justify-center">
+              <FollowButton userIdToFollow={song.userId ? song.userId : ""} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 };
 
