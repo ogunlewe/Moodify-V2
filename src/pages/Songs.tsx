@@ -4,6 +4,7 @@ import { db } from "../firebaseConfig";
 import { Play, Pause } from "lucide-react";
 import FollowButton from "../components/FollowButton";
 import { Song } from "./Home";
+import { Link } from "react-router-dom";
 
 interface SongsProps {
   currentSong: Song | null;
@@ -38,7 +39,12 @@ const Songs: React.FC<SongsProps> = ({ currentSong, isPlaying, togglePlay }) => 
 
   return (
     <section className="p-6 bg-black text-white min-h-screen">
-      <h1 className="text-4xl font-bold mb-6">All Songs</h1>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-4xl font-bold">All Songs</h1>
+        <Link to="/playlists" className="md:hidden bg-green-500 px-4 py-2 rounded-full hover:bg-green-400 transition">
+          Playlists
+        </Link>
+      </div>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {songs.map((song) => (

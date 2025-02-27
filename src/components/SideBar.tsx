@@ -2,10 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Home, Upload, Music, User, ListMusic } from "lucide-react";
 
-const Navbar: React.FC = () => {
-  
+const Sidebar: React.FC = () => {
   return (
-    <nav className="fixed top-0 left-0 h-full bg-gray-900 w-64 p-5 flex flex-col justify-between">
+    <nav className="fixed top-0 left-0 h-full bg-gray-900 w-64 p-5 flex flex-col justify-between hidden md:flex">
       {/* Navigation Links */}
       <ul className="space-y-2">
         <li>
@@ -60,4 +59,4 @@ const Navbar: React.FC = () => {
   );
 };
 
-export default Navbar;
+export default Sidebar;

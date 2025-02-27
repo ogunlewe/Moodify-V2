@@ -1,5 +1,5 @@
-import React from 'react';
-import { Play, Pause, SkipBack, SkipForward, Maximize } from 'lucide-react';
+import React from "react";
+import { Play, Pause, SkipBack, SkipForward, Maximize } from "lucide-react";
 
 interface Song {
   cover: string;
@@ -25,7 +25,7 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({
   onExpand,
 }) => {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4 shadow-lg flex items-center justify-between">
+    <div className="fixed bottom-0 left-0 right-0 bg-gray-900 p-4 shadow-lg flex items-center justify-between z-20">
       {currentSong ? (
         <>
           <div className="flex items-center gap-4">
@@ -39,21 +39,35 @@ const MiniPlayer: React.FC<MiniPlayerProps> = ({
               />
             </div>
             <div>
-              <h3 className="text-lg font-medium">{currentSong.title}</h3>
+              <h3 className="text-lg font-medium text-white">
+                {currentSong.title}
+              </h3>
               <p className="text-sm text-gray-400">{currentSong.artist}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button onClick={onPrev} className="text-white hover:text-green-400 transition">
+            <button
+              onClick={onPrev}
+              className="text-white hover:text-green-400 transition"
+            >
               <SkipBack size={24} />
             </button>
-            <button onClick={onPlayPause} className="text-white hover:text-green-400 transition">
+            <button
+              onClick={onPlayPause}
+              className="text-white hover:text-green-400 transition"
+            >
               {isPlaying ? <Pause size={24} /> : <Play size={24} />}
             </button>
-            <button onClick={onNext} className="text-white hover:text-green-400 transition">
+            <button
+              onClick={onNext}
+              className="text-white hover:text-green-400 transition"
+            >
               <SkipForward size={24} />
             </button>
-            <button onClick={onExpand} className="text-white hover:text-green-400 transition">
+            <button
+              onClick={onExpand}
+              className="text-white hover:text-green-400 transition"
+            >
               <Maximize size={24} />
             </button>
           </div>
